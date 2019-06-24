@@ -1,0 +1,12 @@
+﻿.login{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 0 0 0;
+}
+
+.login-name,
+.login-pass{
+    display: block;
+    margin: 10px 0 10px 0;
+}
