@@ -15,10 +15,11 @@ class Login extends React.Component{
     this.setState({name: event.target.value})
   }
 
-  onSubmit = () => {
+  onSubmit = (event) => {
     const name = this.state.name;
     this.setName(name);
-    this.enterChat();
+    this.enterChat(name);
+    event.preventDefault();
   }
 
   render(){
@@ -31,10 +32,11 @@ class Login extends React.Component{
             className="login-name" 
             type="text" 
             name="name"
+            autoFocus = {true}
             value={this.state.name}
             onChange={this.onChangeName} 
           />
-          <input type="submit" className="login-btn" value="Войти" />
+          <button type="submit" className="login-btn">Войти</button> 
       </form>
     );
   }

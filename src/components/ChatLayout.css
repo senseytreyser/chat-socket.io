@@ -1,7 +1,6 @@
 ﻿.chat{
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
 
     width: 500px;
 }
@@ -18,6 +17,12 @@
 
 .chat-input{
     width: 80%;
+}
+
+.chat-input-row{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .user-list{
