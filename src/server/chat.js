@@ -45,11 +45,12 @@ function createLargeMessObj({id, message, date}, users){
     return obj.id === id;
   })[0]; //Метод возвращает массив с одним элементом, выбираем его
   console.log(user)
+  const name = (user) ? user.name : id;
   return {
     key: date,
     message, 
     date,
-    name: user.name
+    name
   };
 }
 
