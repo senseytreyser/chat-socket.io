@@ -40,7 +40,7 @@ class App extends React.Component {
   sendMessage = (message) => {
     const socket = this.state.socket;
     const date = new Date();
-    socket.emit('sendMessage', {id:socket.id, message, date});
+    socket.emit('sendMessage', { id:socket.id, message, date});
     console.log(date + '\n Отправлено сообщение: ' + message);
   }
   

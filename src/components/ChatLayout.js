@@ -8,7 +8,7 @@ class ChatLayout extends React.Component {
     this.socket = props.socket;
     this.sendMessage = props.sendMessage;
     this.state = {
-      userList: [{id:1,name:'mary'},{id:2,name:'pipin'}],
+      userList: [],
       chatLog: [],
       message: ''
     }
@@ -28,7 +28,15 @@ class ChatLayout extends React.Component {
   newUser = () =>{
     this.socket.on('newUser', ({user, users}) => {
       this.setState({userList: users});
-      console.log(user);
+      console.log('Вошёл новый пользователь ' + user);
+    });
+  }
+
+  //Выход пользователя, обнавляется список
+  exitUser = () =>{
+    this.socket.on('exitUser', ({user, users}) => {
+      this.setState({userList: users});
+      console.log('Пользователь ' + user.name + ' вышел из чата');
     });
   }
 
@@ -38,6 +46,7 @@ class ChatLayout extends React.Component {
       this.setState((prevState) => ({
         chatLog: [...prevState.chatLog, objMessage]
       }));
+      console.log(objMessage)
     });
   }
 
@@ -67,7 +76,7 @@ class ChatLayout extends React.Component {
 
       return (
         <li key={key}> 
-          {date + ' '} {name} {message} 
+          {date + ' '} {name}: {message} 
         </li>
       )
     });

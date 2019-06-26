@@ -16,17 +16,15 @@ io.on('connection',(socket) => {
   console.log('Socket Id ' + socket.id);
   
   //Вход пользователя в чат
-  socket.on('enterChat',( user )=>{
+  socket.on('enterChat',( user ) => {
     users.push(user);
-    console.log(users);
     io.emit('newUser', {user, users});
   });
 
   //Пользователь вышел из чата
   socket.on('disconnect',()=>{
-    users.push(user);
-    console.log(users);
-    io.emit('newUser', {user, users});
+    deleteUser(socket.id, users);
+    io.emit('exitUser', 'user');
   });
 
   //Получение сообщения от пользователя и отправка его всем остальным
@@ -36,20 +34,25 @@ io.on('connection',(socket) => {
     const largMesObj = createLargeMessObj(objMessage, users);
     io.emit('newMessage', largMesObj); //Отправка сообщения всем пользователям
     
-    const {id, message, date} = objMessage;
-    console.log(date + ' Пользователь с id:' + id + ' отправил сообщение: '+ message); //логирование сообщения
+    const {name, message, date} = largMesObj;
+    console.log(date + ' Пользователь по имени:' + name + ' отправил сообщение: '+ message); //логирование сообщения
   })
 
 });
 
-function createLargeMessObj({id, message, date},users){
+function createLargeMessObj({id, message, date}, users){
   const user = users.filter( (obj) => {
     return obj.id === id;
-  });
+  })[0]; //Метод возвращает массив с одним элементом, выбираем его
+  console.log(user)
   return {
     key: date,
     message, 
     date,
     name: user.name
   };
+}
+
+function deleteUser(id, userList){
+  console.log('Пользователь ' + id + ' нас покинул')
 }
