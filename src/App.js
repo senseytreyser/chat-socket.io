@@ -5,14 +5,19 @@ import ChatLayout from './components/ChatLayout';
 import io from 'socket.io-client';
 
 const socketUrl = "http://192.168.1.65:8082";
-const path = document.location.pathname;
 
 class App extends React.Component {
   constructor(props){
     super(props);
+
     this.state = {
       inChat: false,
-      socket: null
+      socket: null,
+      user: {
+        id: '',
+        name: '',
+        room: document.location.pathname
+      }
     }
   }
 
@@ -20,23 +25,31 @@ class App extends React.Component {
     this.initSocket();
   }
 
-  //Создание сокета
-  initSocket = () =>{
-    const namespace = socketUrl + path;
-    const socket = io(namespace);
-    console.log(socket);
-    socket.on('connect',()=>{
-      console.log('Успешное подключение')
+  //Создание сокета и отправка имени комнаты 
+  initSocket = () => {
+    const socket = io(socketUrl);
+    
+    socket.on('connect',() => {
+      console.log('Успешное подключение');
+      this.sendRoomName();
     });
+    
     this.setState({socket})
+  }
+
+  //Отправка информации о URL, которая станет названием комнаты
+  sendRoomName = () => {
+    const socket = this.state.socket;
+    const room = this.state.user.room;
+    socket.emit('sendRoomName', room);
   }
 
   //Изменение сотояния для входа в чат и отправка соответствующего события на сервер
   enterChat = (name) => {
     this.setState({inChat: true});
     const socket = this.state.socket; 
-    socket.emit('enterChat', {id:socket.id, name:name});
-    console.log('Вход в чат под именем ' + name)
+    socket.emit('enterChat', { id:socket.id, name:name });
+    console.log('Вход в чат под именем: ' + name)
   }
 
   //Отправка сообщения
@@ -51,9 +64,9 @@ class App extends React.Component {
     //Выбор интерфейса в зависимости от состояния (в чате или нет)
     const inChat = this.state.inChat;
     const content = (inChat === false ) ? 
-      <Login className="App-login" enterChat={this.enterChat} setName={this.setName} /> 
+      <Login className="App-login" enterChat={this.enterChat} setName={this.setName}/> 
       :   
-      <ChatLayout sendMessage={this.sendMessage} socket={this.state.socket}/>  
+      <ChatLayout user={this.state.user} sendMessage={this.sendMessage} socket={this.state.socket}/>  
     
     return (
       <div className="App">

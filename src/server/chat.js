@@ -1,5 +1,6 @@
 ﻿const app = require('http').createServer();
-const io = require('socket.io')(app);
+const io = module.exports = require('socket.io')(app);
+const chatAction = require('./chatAction');
 
 const PORT = process.env.PORT || 8082;
 
@@ -10,51 +11,6 @@ app.listen(PORT,()=>{
 const users = [];
 const chatLog = [];
 
-
-io.on('connection',(socket) => {
-
-  console.log('Подключение ' + socket.id);
-  
-  //Вход пользователя в чат
-  socket.on('enterChat',( user ) => {
-    console.log('Пользователь ' + user.id + ' вошёл в чат')
-    users.push(user);
-    io.emit('newUser', {user, users});
-  });
-
-  //Пользователь вышел из чата
-  socket.on('disconnect',()=>{
-    deleteUser(socket.id, users);
-    io.emit('exitUser', 'user');
-  });
-
-  //Получение сообщения от пользователя и отправка его всем остальным
-  socket.on('sendMessage', (objMessage) => {
-    chatLog.push(objMessage); //Добавление пришедшего объекта в массив
-
-    const largMesObj = createLargeMessObj(objMessage, users);
-    io.emit('newMessage', largMesObj); //Отправка сообщения всем пользователям
-    
-    const {name, message, date} = largMesObj;
-    console.log(date + ' Пользователь по имени:' + name + ' отправил сообщение: '+ message); //логирование сообщения
-  })
-
+io.on('connection', (socket) => {
+  chatAction(socket, users, chatLog)
 });
-
-function createLargeMessObj({id, message, date}, users){
-  const user = users.filter( (obj) => {
-    return obj.id === id;
-  })[0]; //Метод возвращает массив с одним элементом, выбираем его
-  console.log(user)
-  const name = (user) ? user.name : id;
-  return {
-    key: date,
-    message, 
-    date,
-    name
-  };
-}
-
-function deleteUser(id, userList){
-  console.log('Пользователь ' + id + ' нас покинул')
-}

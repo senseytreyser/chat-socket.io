@@ -6,6 +6,7 @@ class ChatLayout extends React.Component {
     super(props);
 
     this.socket = props.socket;
+    this.user = props.user;
     this.sendMessage = props.sendMessage;
     this.state = {
       userList: [],
@@ -24,21 +25,21 @@ class ChatLayout extends React.Component {
     this.setState({message: event.target.value})
   }
 
-  //Появление нового пользователя, обнавляется список
+  //Появление нового пользователя (!) влюбой комнате обнавляет список пользователей
   newUser = () =>{
-    this.socket.on('newUser', ({user, users}) => {
-      this.setState({userList: users});
-      console.log('Вошёл новый пользователь ' + user);
+    this.socket.on('newUser', ({user, roomUsers}) => {
+      this.setState({userList: roomUsers});
+      console.log('Вошёл новый пользователь ' + user.name);
     });
   }
 
-  //Выход пользователя, обнавляется список
-  exitUser = () =>{
-    this.socket.on('exitUser', ({user, users}) => {
-      this.setState({userList: users});
-      console.log('Пользователь ' + user.name + ' вышел из чата');
-    });
-  }
+  // //Выход пользователя, обнавляется список
+  // exitUser = () =>{
+  //   this.socket.on('exitUser', ({user, users}) => {
+  //     this.setState({userList: users});
+  //     console.log('Пользователь ' + user.name + ' вышел из чата');
+  //   });
+  // }
 
   //Отслеживание новых сообщений с сервера
   newMessage = () => {
