@@ -5,57 +5,72 @@ class ChatLayout extends React.Component {
   constructor(props) {
     super(props);
 
+    this.socket = props.socket;
     this.sendMessage = props.sendMessage;
     this.state = {
-      userList: [{key:1,name:'mary'},{key:2,name:'pipin'}],
-      chatLog: [
-        {key:'10', date:'01/02/43', userName:'mary', message:'mary'},
-        {key:'01', date:'01/02/43', userName:'pipin', message:'mary'}
-      ],
+      userList: [{id:1,name:'mary'},{id:2,name:'pipin'}],
+      chatLog: [],
       message: ''
     }
   }  
 
+  componentDidMount(){
+    this.newMessage();
+    this.newUser();
+  }
+
+  //Контролируемость компонента imput
   onChange = (event) => {
     this.setState({message: event.target.value})
+  }
+
+  //Появление нового пользователя, обнавляется список
+  newUser = () =>{
+    this.socket.on('newUser', ({user, users}) => {
+      this.setState({userList: users});
+      console.log(user);
+    });
+  }
+
+  //Отслеживание новых сообщений с сервера
+  newMessage = () => {
+    this.socket.on('newMessage', (objMessage) => {
+      this.setState((prevState) => ({
+        chatLog: [...prevState.chatLog, objMessage]
+      }));
+    });
   }
 
   //При отправке формы сообщение уходит на сервер, окошко сообщения очищается
   onSubmit = (event) => {
     const message = this.state.message;
     this.sendMessage(message);
-    console.log('Отправка сообщения: ' + message );
-    event.preventDefault();
-    this.setState({message:''});
+    
+    event.preventDefault(); //Блокирование отправки формы
+    this.setState({message:''}); //Очищение формы
   }
   
   render(){
     //Представление в виде списка li элементов массива пользователей чата
     const userList = this.state.userList;
     const userListInLi = userList.map((item) => { 
-      return <li key={item.key}> {item.name} </li> 
+      return <li key={item.id}> {item.name} </li> 
     });
 
     //Представление в виде списка li элементов массива сообщений
     const chatLog = this.state.chatLog;
     const chatLogInLi = chatLog.map((item) => { 
-      return <li key={item.key}> {`${item.date} ${item.userName}: ${item.message}`} </li> 
-    });
+      const date = item.date.substring(11,19);
+      const name = <span className="chat-log-name">{item.name}</span>
+      const message = <span className="chat-log-message">{item.message}</span>
+      const key = item.key;
 
-    // return (
-    //   <form className="chat-input-row" onSubmit={this.onSubmit}>
-    //     <input 
-    //       type="text" 
-    //       className="chat-input"
-    //       autoFocus = {true}
-    //       value={this.state.message}
-    //       onChange={this.onChange}
-    //     />
-    //     <button type="submit" className="chat-btn">
-    //       Отправить
-    //     </button>
-    //   </form>
-    // )
+      return (
+        <li key={key}> 
+          {date + ' '} {name} {message} 
+        </li>
+      )
+    });
 
     return (
     <>

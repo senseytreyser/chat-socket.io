@@ -15,6 +15,10 @@
     overflow-y: auto;
 }
 
+.chat-log-name{
+    font-weight: bold;
+}
+
 .chat-input{
     width: 80%;
 }

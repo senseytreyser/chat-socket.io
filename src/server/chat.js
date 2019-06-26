@@ -8,23 +8,48 @@ app.listen(PORT,()=>{
 });
 
 const users = [];
+const chatLog = [];
 
-io.on('connection',(socket)=>{
+
+io.on('connection',(socket) => {
+
   console.log('Socket Id ' + socket.id);
-
-  socket.on('setUserName', (name)=>{
-    users.push({key:socket.id, name});
+  
+  //Вход пользователя в чат
+  socket.on('enterChat',( user )=>{
+    users.push(user);
     console.log(users);
+    io.emit('newUser', {user, users});
   });
 
-  socket.on('enterChat',( {id, name} )=>{
-    users.push( {id, name} );
-    io.emit('userCame', {name, users});
+  //Пользователь вышел из чата
+  socket.on('disconnect',()=>{
+    users.push(user);
+    console.log(users);
+    io.emit('newUser', {user, users});
   });
 
-  socket.on('sendMessage', (message) => {
-    console.log(message);
+  //Получение сообщения от пользователя и отправка его всем остальным
+  socket.on('sendMessage', (objMessage) => {
+    chatLog.push(objMessage); //Добавление пришедшего объекта в массив
+
+    const largMesObj = createLargeMessObj(objMessage, users);
+    io.emit('newMessage', largMesObj); //Отправка сообщения всем пользователям
+    
+    const {id, message, date} = objMessage;
+    console.log(date + ' Пользователь с id:' + id + ' отправил сообщение: '+ message); //логирование сообщения
   })
 
 });
 
+function createLargeMessObj({id, message, date},users){
+  const user = users.filter( (obj) => {
+    return obj.id === id;
+  });
+  return {
+    key: date,
+    message, 
+    date,
+    name: user.name
+  };
+}

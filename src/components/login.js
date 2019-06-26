@@ -17,7 +17,6 @@ class Login extends React.Component{
 
   onSubmit = (event) => {
     const name = this.state.name;
-    this.setName(name);
     this.enterChat(name);
     event.preventDefault();
   }
