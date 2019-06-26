@@ -7,7 +7,6 @@ class Login extends React.Component{
     this.className = props.className;
     this.setName = props.setName;
     this.enterChat = props.enterChat;
-
     this.state = {name:''};
   }   
 
