@@ -13,10 +13,11 @@ const chatLog = [];
 
 io.on('connection',(socket) => {
 
-  console.log('Socket Id ' + socket.id);
+  console.log('Подключение ' + socket.id);
   
   //Вход пользователя в чат
   socket.on('enterChat',( user ) => {
+    console.log('Пользователь ' + user.id + ' вошёл в чат')
     users.push(user);
     io.emit('newUser', {user, users});
   });
