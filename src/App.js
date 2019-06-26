@@ -5,6 +5,7 @@ import ChatLayout from './components/ChatLayout';
 import io from 'socket.io-client';
 
 const socketUrl = "http://192.168.1.65:8082";
+const path = document.location.pathname;
 
 class App extends React.Component {
   constructor(props){
@@ -21,7 +22,9 @@ class App extends React.Component {
 
   //Создание сокета
   initSocket = () =>{
-    const socket = io(socketUrl);
+    const namespace = socketUrl + path;
+    const socket = io(namespace);
+    console.log(socket);
     socket.on('connect',()=>{
       console.log('Успешное подключение')
     });
